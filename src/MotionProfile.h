@@ -39,6 +39,6 @@ class MotionProfile {
         float REF_a[8] = {0};
         float REF_v[8] = {0};
         float REF_p[8] = {0};
-
+        float direction = 1.0f;
         MoveParams limits;
 };

@@ -21,11 +21,10 @@ static inline float trunc_ts(float val, float Ts){
 
 MotionProfile::MotionProfile(MoveParams move, float _Ts) {
     Ts = _Ts;
-    int_fast8_t move_dir = 0;
     if (move.distance > 0) {
-        move_dir = 1;
+        direction = 1;
     } else {
-        move_dir = -1;
+        direction = -1;
     }
 
     jerk_limit = move.jerk;
@@ -91,9 +90,9 @@ MotionProfile::MotionProfile(MoveParams move, float _Ts) {
 
     // t2 now fixed
     const float t2_2 = pow2(t2);
-    t3 = (move.distance - 2.0f*jerk_limit*t1_3 - 3.0f*jerk_limit*t1_2*t2 - jerk_limit*t1*t2_2)/move.velocity;
+    t3 = (absMove - 2.0f*jerk_limit*t1_3 - 3.0f*jerk_limit*t1_2*t2 - jerk_limit*t1*t2_2)/move.velocity;
     t3 = trunc_ts(t3, Ts);
-    jerk_limit = move.distance/(2.0f*t1_3 + 3.0f*t1_2*t2 + t1*t2_2 + t1_2*t3 + t1*t2*t3);
+    jerk_limit = absMove/(2.0f*t1_3 + 3.0f*t1_2*t2 + t1*t2_2 + t1_2*t3 + t1*t2*t3);
 
     const float j = jerk_limit;
     PRINT_JERK(jerk_limit);
@@ -137,7 +136,7 @@ MotionProfile::MotionProfile(MoveParams move, float _Ts) {
     
     REF_a[7]=REF_a[6]+j*(REF_t[7]-REF_t[6]);
     REF_v[7]=REF_v[6]+REF_a[6]*(REF_t[7]-REF_t[6])+0.5f*j*(REF_t[7]-REF_t[6])*(REF_t[7]-REF_t[6]);
-	REF_p[7] = move.distance;
+	REF_p[7] = absMove;
 }
 
 MoveParams MotionProfile::get(float t) {
@@ -233,9 +232,9 @@ MoveParams MotionProfile::get(float t) {
     // pos += REF_p[0];
 	
     MoveParams ret = MoveParams();
-    ret.distance = pos;
-    ret.velocity = vel;
-    ret.acceleration = accel;
-    ret.jerk = jref;
+    ret.distance = direction*pos;
+    ret.velocity = direction*vel;
+    ret.acceleration = direction*accel;
+    ret.jerk = direction*jref;
 	return ret;
 }
