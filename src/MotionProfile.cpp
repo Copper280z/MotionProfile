@@ -221,15 +221,6 @@ MoveParams MotionProfile::get(float t) {
     else {
         pos = REF_p[7];
     }
-
-
-    // if (REFidir == 0) {
-    //     jref = -jref;
-    //     accel = -accel;
-    //     vel = -vel;
-    //     pos = -pos;
-    // }
-    // pos += REF_p[0];
 	
     MoveParams ret = MoveParams();
     ret.distance = direction*pos;
