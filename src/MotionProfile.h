@@ -2,7 +2,13 @@
 
 #include <inttypes.h>
 
-// more profiles to investigate
+// This is primarily inspired by the following sources:
+// https://github.com/ElwinBoots/Teensy_DualMotorBoard_V1
+// https://pure.tue.nl/ws/files/4272353/614834.pdf
+// https://dsdwiki.wtb.tue.nl/wiki/File:Ref3.zip
+
+
+// more profiles to investigate, these are all sorta ugly, though
 // https://www.20sim.com/webhelp/toolboxes_mechatronics_toolbox_motion_profile_wizard_motionprofiles.php
 
 struct MoveParams{
