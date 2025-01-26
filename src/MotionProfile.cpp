@@ -15,12 +15,12 @@ static inline float pow2(float val){
     return val*val;
 }
 
-static inline float trunc_ts(float val){
+static inline float trunc_ts(float val, float Ts){
     return int(val/Ts)*Ts;
 }
 
-MotionProfile::MotionProfile(MoveParams move) {
-
+MotionProfile::MotionProfile(MoveParams move, float _Ts) {
+    Ts = _Ts;
     int_fast8_t move_dir = 0;
     if (move.distance > 0) {
         move_dir = 1;
@@ -34,7 +34,7 @@ MotionProfile::MotionProfile(MoveParams move) {
     float absMove = abs(move.distance);
 
     t1 = cbrtf(absMove/(2.0f*t1_jerk_limit));
-    t1 = trunc_ts(t1); // truncate to a controller update, possibly unnecessary?
+    t1 = trunc_ts(t1, Ts); // truncate to a controller update, possibly unnecessary?
     PRINT("t1: %.3f\n", t1);
     t1_jerk_limit = 0.5f*absMove/pow3(t1);
     PRINT_JERK(t1_jerk_limit);
@@ -45,7 +45,7 @@ MotionProfile::MotionProfile(MoveParams move) {
     if (v_test > move.velocity) {
         PRINT("velocity limit violated with given jerk limit\n");
         t1 = sqrtf(move.velocity/move.jerk);
-        t1 = trunc_ts(t1);
+        t1 = trunc_ts(t1, Ts);
         t1_jerk_limit = move.velocity/pow2(t1);
     }
     PRINT_JERK(t1_jerk_limit);
@@ -58,7 +58,7 @@ MotionProfile::MotionProfile(MoveParams move) {
         PRINT("acceleration limit violated with given jerk limit\n");
         PRINT("\tlimit:val %.3f:%.3f\n", move.acceleration, a_test);
         t1 = move.acceleration / move.jerk;
-        t1 = trunc_ts(t1);
+        t1 = trunc_ts(t1, Ts);
         t1_jerk_limit = move.acceleration/t1;
         PRINT("\tNew accel: %.3f\n", t1_jerk_limit*t1);
         PRINT("\tNew t1: %.3f\n", t1);
@@ -73,7 +73,7 @@ MotionProfile::MotionProfile(MoveParams move) {
     const float t1_2 = pow2(t1);
     const float t1_3 = t1_2 * t1;
     t2 = sqrtf(t1_2 / 4.0f + absMove/jerk_limit/t1) - 3.0f*t1/2.0f;
-    t2 = trunc_ts(t2);
+    t2 = trunc_ts(t2, Ts);
     PRINT("t2: %.3f\n", t2);
 
     t2_jerk_limit = absMove/(2.0f*t1_3 + 3.0f*t1_2 * t2 + t1*pow2(t2));
@@ -83,7 +83,7 @@ MotionProfile::MotionProfile(MoveParams move) {
     if (t2_v_test > move.velocity) {
         PRINT("velocity limit violated with given accel limit");
         t2 = move.velocity/(jerk_limit*t1) - t1;
-        t2 = trunc_ts(t2);
+        t2 = trunc_ts(t2, Ts);
         t2_jerk_limit = move.velocity/(t1_2 + t1*t2);
     }
     jerk_limit = t2_jerk_limit;
@@ -92,7 +92,7 @@ MotionProfile::MotionProfile(MoveParams move) {
     // t2 now fixed
     const float t2_2 = pow2(t2);
     t3 = (move.distance - 2.0f*jerk_limit*t1_3 - 3.0f*jerk_limit*t1_2*t2 - jerk_limit*t1*t2_2)/move.velocity;
-    t3 = trunc_ts(t3);
+    t3 = trunc_ts(t3, Ts);
     jerk_limit = move.distance/(2.0f*t1_3 + 3.0f*t1_2*t2 + t1*t2_2 + t1_2*t3 + t1*t2*t3);
 
     const float j = jerk_limit;

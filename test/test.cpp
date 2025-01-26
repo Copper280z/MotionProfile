@@ -26,7 +26,7 @@ int main(int argc, char** argv){
     float max_time = 100;
     float t=0;
 
-    MotionProfile profile(params);
+    MotionProfile profile(params, Ts);
 
     std::vector<float> jerk;
     std::vector<float> accel;

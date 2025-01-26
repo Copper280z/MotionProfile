@@ -2,10 +2,8 @@
 
 #include <inttypes.h>
 
-// profiles to investigate
+// more profiles to investigate
 // https://www.20sim.com/webhelp/toolboxes_mechatronics_toolbox_motion_profile_wizard_motionprofiles.php
-
-static const float Ts = 1.0f/20000.0f;
 
 struct MoveParams{
     uint32_t start_time = 0;
@@ -17,14 +15,15 @@ struct MoveParams{
 
 class MotionProfile {
     public:
-        MotionProfile(MoveParams move);
+        MotionProfile(MoveParams move, float Ts);
 
         /*
         Calculates the profile paramters for the given time, relative to the start time
         */
         MoveParams get(float time);
 
-    private:        
+    private:  
+        float Ts = 1.0f/20000.0f;      
         float t1=0;
         float t2=0;
         float t3=0;
